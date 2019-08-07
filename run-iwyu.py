@@ -97,8 +97,14 @@ def list_compile_commands(build_dir, paths, extensions=None, exclude=None):
             continue
 
         to_keep = False
+        if files:
+            try:
+                st = os.stat(path)
+            except EnvironmentError as e:
+                if e.errno != errno.ENOENT:
+                    raise
+                continue
         for file_st in files:
-            st = os.stat(path)
             if os.path.samestat(file_st, st):
                 to_keep = True
                 break
@@ -106,7 +112,12 @@ def list_compile_commands(build_dir, paths, extensions=None, exclude=None):
             curdir = os.path.dirname(os.path.normpath(path))
             olddir = None
             while not curdir == olddir:
-                st_curdir = os.stat(curdir)
+                try:
+                    st_curdir = os.stat(curdir)
+                except EnvironmentError as e:
+                    if e.errno != errno.ENOENT:
+                        raise
+                    break
                 for dir_st in dirs:
                     if os.path.samestat(dir_st, st_curdir):
                         to_keep = True
