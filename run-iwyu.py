@@ -223,7 +223,12 @@ def main():
     parser.add_argument(
         "-p", dest="build_dir", metavar="BUILD_DIR", help="build path", required=True
     )
-    parser.add_argument("files", metavar="file", nargs="+")
+    parser.add_argument(
+        "files",
+        metavar="file",
+        nargs="*",
+        help="restrict the compilation database entries to process to the given paths",
+    )
     parser.add_argument(
         "-j",
         metavar="N",
@@ -272,7 +277,7 @@ def main():
 
     retcode = ExitStatus.SUCCESS
     compile_commands = list_compile_commands(
-        args.build_dir, args.files, exclude=args.exclude
+        args.build_dir, args.files or ["."], exclude=args.exclude
     )
 
     if not compile_commands:
